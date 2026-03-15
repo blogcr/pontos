@@ -8,22 +8,30 @@
 
 <title>ALCR • Últimas postagens</title>
 
+<link href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;600;700&display=swap" rel="stylesheet">
+
 <link rel="stylesheet"
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
 
+/* página */
+
 body{
-font-family:Arial,sans-serif;
+font-family:'Arimo',sans-serif;
 background:#f4f4f4;
 margin:0;
 padding:30px;
 }
 
+/* container */
+
 #Rankin{
 max-width:1200px;
 margin:auto;
 }
+
+/* grid */
 
 #Rankin ul{
 padding:0;
@@ -35,6 +43,8 @@ justify-content:center;
 gap:15px;
 }
 
+/* card */
+
 #Rankin li{
 width:220px;
 height:150px;
@@ -44,11 +54,15 @@ border-radius:4px;
 box-shadow:0 2px 5px rgba(0,0,0,0.2);
 }
 
+/* imagem */
+
 #Rankin img{
 width:100%;
 height:100%;
 object-fit:cover;
 }
+
+/* overlay */
 
 .overlay{
 position:absolute;
@@ -60,13 +74,15 @@ background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,0.9));
 z-index:2;
 }
 
+/* título */
+
 .item-title{
 padding:0 10px;
 font-size:1.2em;
 line-height:1em;
 width:100%;
 color:#fff;
-font-weight:bold;
+font-weight:700;
 position:absolute;
 top:65%;
 left:0;
@@ -80,12 +96,14 @@ overflow:hidden;
 text-shadow:1px 1px 2px rgba(0,0,0,0.8);
 }
 
+/* categoria */
+
 .cate{
 background:#000;
 text-transform:uppercase;
 padding:3px 6px;
 font-size:0.8em;
-font-weight:bold;
+font-weight:700;
 position:absolute;
 right:10px;
 top:10px;
@@ -93,6 +111,8 @@ color:#fff;
 border-radius:3px;
 z-index:3;
 }
+
+/* contador */
 
 .rank-score{
 
@@ -105,7 +125,7 @@ color:#fff;
 
 padding:3px 7px;
 font-size:12px;
-font-weight:bold;
+font-weight:700;
 
 border-radius:4px;
 z-index:4;
@@ -117,6 +137,8 @@ display:none;
 margin-left:3px;
 font-size:11px;
 }
+
+/* link */
 
 #Rankin a{
 text-decoration:none;
@@ -136,19 +158,24 @@ height:100%;
 
 <script>
 
-/* endpoint do ranking */
+/* endpoint pontuações */
 
 var rankingURL =
 "https://script.google.com/macros/s/AKfycbxJkEccCVZOs4qOV45g6L_sjKH2L0US0Vpq2j8pWzyca4a8IpSbpCfuaLtKJYGtqxg/exec?tipo=pontuacoes";
 
 var ranking = {};
+var feedPronto = false;
 
-/* carrega pontuações */
+/* carregar pontuações */
 
 fetch(rankingURL)
-.then(r=>r.json())
+.then(function(r){return r.json();})
 .then(function(data){
+
 ranking = data;
+
+aplicarPontuacoes();
+
 });
 
 /* função chamada pelo feed */
@@ -187,13 +214,13 @@ html+="<li>";
 
 html+='<a href="'+link+'" target="_blank">';
 
-html+='<div class="cate">'+categoria+"</div>";
+html+='<div class="cate">'+categoria+"</div>';
 
 html+='<img src="'+thumb+'">';
 
 html+='<div class="overlay"></div>';
 
-html+='<div class="item-title">'+title+"</div>";
+html+='<div class="item-title">'+title+"</div>';
 
 html+="</a>";
 
@@ -207,7 +234,17 @@ html+="</ul>";
 
 document.getElementById("Rankin").innerHTML=html;
 
+feedPronto=true;
+
+aplicarPontuacoes();
+
+}
+
 /* inserir pontuações */
+
+function aplicarPontuacoes(){
+
+if(!feedPronto) return;
 
 Object.keys(ranking).forEach(function(slug){
 
@@ -227,7 +264,7 @@ el.style.display="block";
 
 </script>
 
-<!-- FEED DO BLOGGER (JSONP) -->
+<!-- feed do blogger -->
 
 <script src="https://www.carlosromero.com.br/feeds/posts/default?max-results=17&alt=json-in-script&callback=listemall"></script>
 
