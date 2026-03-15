@@ -8,11 +8,10 @@
 
 <title>ALCR • Últimas postagens</title>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-
-/* página */
 
 body{
 font-family:Arial,sans-serif;
@@ -21,14 +20,10 @@ margin:0;
 padding:30px;
 }
 
-/* container */
-
 #Rankin{
 max-width:1200px;
 margin:auto;
 }
-
-/* grid */
 
 #Rankin ul{
 padding:0;
@@ -40,8 +35,6 @@ justify-content:center;
 gap:15px;
 }
 
-/* card */
-
 #Rankin li{
 width:220px;
 height:150px;
@@ -51,15 +44,11 @@ border-radius:4px;
 box-shadow:0 2px 5px rgba(0,0,0,0.2);
 }
 
-/* imagem */
-
 #Rankin img{
 width:100%;
 height:100%;
 object-fit:cover;
 }
-
-/* overlay */
 
 .overlay{
 position:absolute;
@@ -70,8 +59,6 @@ height:100%;
 background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,0.9));
 z-index:2;
 }
-
-/* título */
 
 .item-title{
 padding:0 10px;
@@ -93,8 +80,6 @@ overflow:hidden;
 text-shadow:1px 1px 2px rgba(0,0,0,0.8);
 }
 
-/* categoria */
-
 .cate{
 background:#000;
 text-transform:uppercase;
@@ -108,8 +93,6 @@ color:#fff;
 border-radius:3px;
 z-index:3;
 }
-
-/* contador */
 
 .rank-score{
 
@@ -153,26 +136,28 @@ height:100%;
 
 <script>
 
-/* endpoints */
+/* endpoint do ranking */
 
-var feed="https://www.carlosromero.com.br/feeds/posts/default?max-results=17&alt=json";
+var rankingURL =
+"https://script.google.com/macros/s/AKfycbxJkEccCVZOs4qOV45g6L_sjKH2L0US0Vpq2j8pWzyca4a8IpSbpCfuaLtKJYGtqxg/exec?tipo=pontuacoes";
 
-var api="https://script.google.com/macros/s/AKfycbxJkEccCVZOs4qOV45g6L_sjKH2L0US0Vpq2j8pWzyca4a8IpSbpCfuaLtKJYGtqxg/exec?tipo=pontuacoes";
+var ranking = {};
 
-/* carregar dados */
+/* carrega pontuações */
 
-Promise.all([
+fetch(rankingURL)
+.then(r=>r.json())
+.then(function(data){
+ranking = data;
+});
 
-fetch(feed).then(r=>r.json()),
-fetch(api).then(r=>r.json())
+/* função chamada pelo feed */
 
-])
-
-.then(function([blog,ranking]){
+function listemall(json){
 
 var html="<ul>";
 
-var entries=blog.feed.entry;
+var entries=json.feed.entry;
 
 entries.forEach(function(entry){
 
@@ -238,9 +223,13 @@ el.style.display="block";
 
 });
 
-});
+}
 
 </script>
+
+<!-- FEED DO BLOGGER (JSONP) -->
+
+<script src="https://www.carlosromero.com.br/feeds/posts/default?max-results=17&alt=json-in-script&callback=listemall"></script>
 
 </body>
 </html>
