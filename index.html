@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ALCR • Últimas postagens</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+
+/* página */
+
+body{
+font-family:Arial,sans-serif;
+background:#f4f4f4;
+margin:0;
+padding:30px;
+}
+
+/* container */
+
+#Rankin{
+max-width:1200px;
+margin:auto;
+}
+
+/* grid */
+
+#Rankin ul{
+padding:0;
+margin:0;
+list-style:none;
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:15px;
+}
+
+/* card */
+
+#Rankin li{
+width:220px;
+height:150px;
+position:relative;
+overflow:hidden;
+border-radius:4px;
+box-shadow:0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* imagem */
+
+#Rankin img{
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
+/* overlay */
+
+.overlay{
+position:absolute;
+left:0;
+top:0;
+width:100%;
+height:100%;
+background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,0.9));
+z-index:2;
+}
+
+/* título */
+
+.item-title{
+padding:0 10px;
+font-size:1.2em;
+line-height:1em;
+width:100%;
+color:#fff;
+font-weight:bold;
+position:absolute;
+top:65%;
+left:0;
+z-index:3;
+
+display:-webkit-box;
+-webkit-line-clamp:2;
+-webkit-box-orient:vertical;
+overflow:hidden;
+
+text-shadow:1px 1px 2px rgba(0,0,0,0.8);
+}
+
+/* categoria */
+
+.cate{
+background:#000;
+text-transform:uppercase;
+padding:3px 6px;
+font-size:0.8em;
+font-weight:bold;
+position:absolute;
+right:10px;
+top:10px;
+color:#fff;
+border-radius:3px;
+z-index:3;
+}
+
+/* contador */
+
+.rank-score{
+
+position:absolute;
+left:10px;
+top:10px;
+
+background:rgba(0,0,0,0.75);
+color:#fff;
+
+padding:3px 7px;
+font-size:12px;
+font-weight:bold;
+
+border-radius:4px;
+z-index:4;
+
+display:none;
+}
+
+.rank-score i{
+margin-left:3px;
+font-size:11px;
+}
+
+#Rankin a{
+text-decoration:none;
+color:#fff;
+display:block;
+width:100%;
+height:100%;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="Rankin">Carregando...</div>
+
+<script>
+
+/* endpoints */
+
+var feed="https://www.carlosromero.com.br/feeds/posts/default?max-results=17&alt=json";
+
+var api="https://script.google.com/macros/s/AKfycbxJkEccCVZOs4qOV45g6L_sjKH2L0US0Vpq2j8pWzyca4a8IpSbpCfuaLtKJYGtqxg/exec?tipo=pontuacoes";
+
+/* carregar dados */
+
+Promise.all([
+
+fetch(feed).then(r=>r.json()),
+fetch(api).then(r=>r.json())
+
+])
+
+.then(function([blog,ranking]){
+
+var html="<ul>";
+
+var entries=blog.feed.entry;
+
+entries.forEach(function(entry){
+
+var title=entry.title.$t;
+
+var categoria="Geral";
+
+if(entry.category && entry.category.length>0){
+categoria=entry.category[0].term;
+}
+
+var thumb="https://via.placeholder.com/320x150?text=Sem+Imagem";
+
+if(entry.media$thumbnail){
+thumb=entry.media$thumbnail.url.replace("s72-c","s320");
+}
+
+var link="#";
+
+entry.link.forEach(function(l){
+if(l.rel==="alternate"){link=l.href;}
+});
+
+var slug=link.substring(link.lastIndexOf("/")+1).replace(".html","");
+
+html+="<li>";
+
+html+='<a href="'+link+'" target="_blank">';
+
+html+='<div class="cate">'+categoria+"</div>";
+
+html+='<img src="'+thumb+'">';
+
+html+='<div class="overlay"></div>';
+
+html+='<div class="item-title">'+title+"</div>";
+
+html+="</a>";
+
+html+='<div class="rank-score" id="score-'+slug+'"></div>';
+
+html+="</li>";
+
+});
+
+html+="</ul>";
+
+document.getElementById("Rankin").innerHTML=html;
+
+/* inserir pontuações */
+
+Object.keys(ranking).forEach(function(slug){
+
+var el=document.getElementById("score-"+slug);
+
+if(el){
+
+el.innerHTML=ranking[slug]+' <i class="fa-solid fa-book-open"></i>';
+
+el.style.display="block";
+
+}
+
+});
+
+});
+
+</script>
+
+</body>
+</html>
