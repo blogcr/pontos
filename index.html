@@ -27,8 +27,6 @@ max-width:1200px;
 margin:auto;
 }
 
-/* grid */
-
 #Rankin ul{
 padding:0;
 margin:0;
@@ -39,8 +37,6 @@ justify-content:center;
 gap:15px;
 }
 
-/* card */
-
 #Rankin li{
 width:220px;
 height:150px;
@@ -50,15 +46,11 @@ border-radius:4px;
 box-shadow:0 2px 5px rgba(0,0,0,0.2);
 }
 
-/* imagem */
-
 #Rankin img{
 width:100%;
 height:100%;
 object-fit:cover;
 }
-
-/* overlay */
 
 .overlay{
 position:absolute;
@@ -69,8 +61,6 @@ height:100%;
 background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,0.9));
 z-index:2;
 }
-
-/* título */
 
 .item-title{
 padding:0 10px;
@@ -92,8 +82,6 @@ overflow:hidden;
 text-shadow:1px 1px 2px rgba(0,0,0,0.8);
 }
 
-/* categoria */
-
 .cate{
 background:#000;
 text-transform:uppercase;
@@ -108,10 +96,7 @@ border-radius:3px;
 z-index:3;
 }
 
-/* contador */
-
 .rank-score{
-
 position:absolute;
 left:10px;
 top:10px;
@@ -152,15 +137,24 @@ height:100%;
 
 <script>
 
-/* função chamada pelo feed */
+var feedURL =
+"https://api.allorigins.win/raw?url=https://www.carlosromero.com.br/feeds/posts/default?max-results=17&alt=json";
 
-function listemall(json){
+var rankingURL =
+"https://script.google.com/macros/s/AKfycbxJkEccCVZOs4qOV45g6L_sjKH2L0US0Vpq2j8pWzyca4a8IpSbpCfuaLtKJYGtqxg/exec?tipo=pontuacoes";
+
+Promise.all([
+
+fetch(feedURL).then(r=>r.json()),
+fetch(rankingURL).then(r=>r.json())
+
+])
+
+.then(function([feed,ranking]){
 
 var html="<ul>";
 
-var entries=json.feed.entry;
-
-entries.forEach(function(entry){
+feed.feed.entry.forEach(function(entry){
 
 var title=entry.title.$t;
 
@@ -170,13 +164,11 @@ categoria=entry.category[0].term;
 }
 
 var thumb="https://via.placeholder.com/320x150?text=Sem+Imagem";
-
 if(entry.media$thumbnail){
 thumb=entry.media$thumbnail.url.replace("s72-c","s320");
 }
 
 var link="#";
-
 entry.link.forEach(function(l){
 if(l.rel==="alternate"){link=l.href;}
 });
@@ -207,14 +199,6 @@ html+="</ul>";
 
 document.getElementById("Rankin").innerHTML=html;
 
-/* depois que os cards existem, buscamos as pontuações */
-
-fetch("https://script.google.com/macros/s/AKfycbxJkEccCVZOs4qOV45g6L_sjKH2L0US0Vpq2j8pWzyca4a8IpSbpCfuaLtKJYGtqxg/exec?tipo=pontuacoes")
-
-.then(function(r){return r.json();})
-
-.then(function(ranking){
-
 Object.keys(ranking).forEach(function(slug){
 
 var el=document.getElementById("score-"+slug);
@@ -231,13 +215,7 @@ el.style.display="block";
 
 });
 
-}
-
 </script>
-
-<!-- feed do blogger -->
-
-<script src="https://www.carlosromero.com.br/feeds/posts/default?max-results=17&alt=json-in-script&callback=listemall"></script>
 
 </body>
 </html>
