@@ -72,12 +72,10 @@ position:absolute;
 left:18px;
 right:18px;
 top:100px;
-
 color:#fff;
 font-weight:600;
 font-size:18px;
 line-height:1.25;
-
 display:-webkit-box;
 -webkit-line-clamp:2;
 -webkit-box-orient:vertical;
@@ -119,9 +117,7 @@ var pontuacoes={};
 /* carregar pontuações históricas */
 
 fetch("https://script.google.com/macros/s/AKfycbxJkEccCVZOs4qOV45g6L_sjKH2L0US0Vpq2j8pWzyca4a8IpSbpCfuaLtKJYGtqxg/exec?tipo=pontuacoes")
-
 .then(r=>r.json())
-
 .then(function(data){
 
 pontuacoes=data;
@@ -135,9 +131,20 @@ function carregarFeed(){
 
 var script=document.createElement("script");
 
-script.src="https://www.carlosromero.com.br/feeds/posts/default?max-results=17&alt=json-in-script&callback=renderPosts";
+script.src="https://www.carlosromero.com.br/feeds/posts/default?orderby=published&max-results=17&alt=json-in-script&callback=renderPosts";
 
 document.body.appendChild(script);
+
+}
+
+
+function normalizarPath(url){
+
+var path=new URL(url).pathname;
+
+path=path.replace("index.html","");
+
+return path;
 
 }
 
@@ -167,9 +174,15 @@ entry.link.forEach(function(l){
 if(l.rel=="alternate") link=l.href;
 });
 
+
 /* chave da pontuação */
 
-var path=new URL(link).pathname;
+var path=normalizarPath(link);
+
+var pontuacao=pontuacoes[path] || 0;
+
+
+/* imagem */
 
 var imagem="";
 
@@ -177,8 +190,8 @@ if(entry.media$thumbnail){
 imagem=entry.media$thumbnail.url.replace("s72-c","w800");
 }
 
-var pontuacao=pontuacoes[path]||0;
 
+/* card */
 
 var card=document.createElement("a");
 
