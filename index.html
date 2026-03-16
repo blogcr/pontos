@@ -19,15 +19,11 @@ background:#f4f4f4;
 margin:20px;
 }
 
-/* GRID */
-
 .grid{
 display:grid;
 grid-template-columns:repeat(5,1fr);
 gap:18px;
 }
-
-/* CARD */
 
 .card{
 position:relative;
@@ -51,15 +47,11 @@ height:100%;
 object-fit:cover;
 }
 
-/* OVERLAY */
-
 .overlay{
 position:absolute;
 inset:0;
 background:linear-gradient(to top,rgba(0,0,0,0.85),rgba(0,0,0,0.15));
 }
-
-/* AUTOR */
 
 .autor{
 position:absolute;
@@ -74,8 +66,6 @@ font-weight:700;
 text-transform:uppercase;
 z-index:3;
 }
-
-/* TITULO */
 
 .titulo{
 position:absolute;
@@ -94,8 +84,6 @@ display:-webkit-box;
 overflow:hidden;
 }
 
-/* PONTOS */
-
 .pontos{
 position:absolute;
 top:12px;
@@ -107,8 +95,6 @@ color:#fff;
 font-size:13px;
 font-weight:700;
 }
-
-/* RESPONSIVO */
 
 @media(max-width:1200px){
 .grid{grid-template-columns:repeat(3,1fr);}
@@ -128,56 +114,89 @@ font-weight:700;
 
 <script>
 
-/* endpoint correto do Apps Script */
+var pontuacoes={};
 
-var api="https://script.google.com/macros/s/AKfycbxJkEccCVZOs4qOV45g6L_sjKH2L0US0Vpq2j8pWzyca4a8IpSbpCfuaLtKJYGtqxg/exec?tipo=ultimas";
+/* carregar pontuações históricas */
 
-var container=document.getElementById("posts");
+fetch("https://script.google.com/macros/s/AKfycbxJkEccCVZOs4qOV45g6L_sjKH2L0US0Vpq2j8pWzyca4a8IpSbpCfuaLtKJYGtqxg/exec?tipo=pontuacoes")
 
-fetch(api)
-
-.then(function(response){
-return response.json();
-})
+.then(r=>r.json())
 
 .then(function(data){
 
-if(!data || data.length===0){
+pontuacoes=data;
 
-container.innerHTML="Nenhum resultado.";
+carregarFeed();
 
-return;
+});
+
+
+function carregarFeed(){
+
+var script=document.createElement("script");
+
+script.src="https://www.carlosromero.com.br/feeds/posts/default?max-results=17&alt=json-in-script&callback=renderPosts";
+
+document.body.appendChild(script);
 
 }
+
+
+function renderPosts(json){
+
+var container=document.getElementById("posts");
 
 container.innerHTML='<div class="grid"></div>';
 
 var grid=container.querySelector(".grid");
 
-data.forEach(function(item){
 
-var imagem=item.imagem
-? item.imagem.replace(/\/w\d+-h\d+[^/]*\//,"/w800/")
-: "";
+json.feed.entry.forEach(function(entry){
+
+var titulo=entry.title.$t;
+
+var autor="Autor";
+
+if(entry.category && entry.category.length>0){
+autor=entry.category[0].term;
+}
+
+var link="";
+
+entry.link.forEach(function(l){
+if(l.rel=="alternate") link=l.href;
+});
+
+/* chave da pontuação */
+
+var path=new URL(link).pathname;
+
+var imagem="";
+
+if(entry.media$thumbnail){
+imagem=entry.media$thumbnail.url.replace("s72-c","w800");
+}
+
+var pontuacao=pontuacoes[path]||0;
+
 
 var card=document.createElement("a");
 
-card.href=item.url;
+card.href=link;
 card.target="_blank";
 card.className="card";
 
 card.innerHTML=`
 
 <img src="${imagem}">
-
 <div class="overlay"></div>
 
-<div class="autor">${item.autor}</div>
+<div class="autor">${autor}</div>
 
-<div class="titulo">${item.titulo}</div>
+<div class="titulo">${titulo}</div>
 
 <div class="pontos">
-${item.pontuacao} <i class="fa-solid fa-chart-simple"></i>
+${pontuacao} <i class="fa-solid fa-chart-simple"></i>
 </div>
 
 `;
@@ -186,15 +205,7 @@ grid.appendChild(card);
 
 });
 
-})
-
-.catch(function(err){
-
-console.error(err);
-
-container.innerHTML="<p style='color:#b00'>Erro ao carregar.</p>";
-
-});
+}
 
 </script>
 
