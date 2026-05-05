@@ -141,11 +141,14 @@ document.body.appendChild(script);
 
 function normalizarPath(url){
 
-var path=new URL(url).pathname;
+  var path = new URL(url).pathname;
 
-path=path.replace("index.html","");
+  // remove barra final, se existir
+  if(path.endsWith("/")){
+    path = path.slice(0, -1);
+  }
 
-return path;
+  return path;
 
 }
 
@@ -180,7 +183,7 @@ if(l.rel=="alternate") link=l.href;
 
 var path=normalizarPath(link);
 
-var pontuacao=pontuacoes[path] || 0;
+var pontuacao = pontuacoes[path] ?? pontuacoes[path + ".html"] ?? 0;
 
 
 /* imagem */
